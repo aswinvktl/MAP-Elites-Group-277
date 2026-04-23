@@ -20,18 +20,18 @@ class Simulation:
             self._setup_isaac_sim()
 
     def _setup_isaac_sim(self):
-        """
-        Set up Isaac Sim environment.
-        Only called when use_mock=False.
-        David/Kip: fill this in once confirmed working.
-        """
+        """Set up Isaac Sim environment. Called once when use_mock=False."""
         import gymnasium as gym
         import isaaclab_tasks
         from isaaclab_tasks.utils.parse_cfg import parse_env_cfg
 
-        # These will be passed in from command line args in real use
-        # For now placeholder
-        raise NotImplementedError("Real sim setup: David/Kip to complete.")
+        env_cfg = parse_env_cfg(
+            "Isaac-Ant-v0",
+            num_envs=self.num_envs,
+        )
+        env_cfg.episode_length_s = self.episode_length / 60.0  # assumes 60Hz sim
+        self.env = gym.make("Isaac-Ant-v0", cfg=env_cfg)
+        print(f"[SIM] Isaac Sim environment created with {self.num_envs} envs.")
 
     def evaluate(self, controllers, device=torch.device("cpu")):
         """
@@ -85,19 +85,38 @@ class Simulation:
 
     def _run_real(self, controllers, device):
         """
-        Real Isaac Sim evaluation.
-        David/Kip: complete this once x/y position confirmed.
-
-        What needs to go here:
-        1. Reset all envs
-        2. For each step in episode:
-             - Get joint positions from obs["policy"][:, 12:20]  (8 joint angles)
-             - Pass through controller to get actions
-             - Step the environment
-             - Accumulate joint velocities for energy
-        3. After episode:
-             - Get final x, y from root_pos_w
-             - Calculate average energy
-        4. Return list of (energy, x, y)
+        Real Isaac Sim evaluation. Runs one controller at a time (each uses all num_envs slots
+        for parallel rollouts, averaged to a single result).
         """
-        raise NotImplementedError("Real sim: David/Kip to complete.")
+        results = []
+
+        for idx, controller in enumerate(controllers):
+            print(f"  [SIM] Evaluating controller {idx + 1}/{len(controllers)}...")
+            obs_dict, _ = self.env.reset()
+
+            total_energy = 0.0
+
+            for step in range(self.episode_length):
+                # Joint angles are at indices 12:20 in the policy observation
+                joint_angles = obs_dict["policy"][:, 12:20].to(device)  # shape: (num_envs, 8)
+
+                with torch.no_grad():
+                    actions = controller(joint_angles)  # shape: (num_envs, 8)
+
+                obs_dict, _, terminated, truncated, info = self.env.step(actions.cpu().numpy())
+
+                # Energy = mean absolute joint torque/velocity across envs and joints
+                total_energy += torch.abs(actions).mean().item()
+
+            avg_energy = total_energy / self.episode_length
+
+            # Final x, y position of the ant (averaged across envs)
+            # root_pos_w is the world-frame root position: shape (num_envs, 3)
+            root_pos = self.env.unwrapped.scene["robot"].data.root_pos_w  # (num_envs, 3)
+            final_x = root_pos[:, 0].mean().item()
+            final_y = root_pos[:, 1].mean().item()
+
+            print(f"  [SIM] Controller {idx + 1}: energy={avg_energy:.4f}, pos=({final_x:.2f}, {final_y:.2f})")
+            results.append((avg_energy, final_x, final_y))
+
+        return results
