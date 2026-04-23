@@ -6,6 +6,7 @@ ADD PRINT STATEMENTS TO SEE WHAT IS HAPPENING, also TEST CODE
 
 import torch
 import csv
+import os
 from datetime import datetime
 
 from controller import Controller
@@ -33,7 +34,6 @@ def log_metrics(generation, archive):
             file_exists = len(f.readlines()) > 0
     except FileNotFoundError:
         pass
-    # create archive file if it doesn't exist
     with open(METRICS_FILE, "a", newline="") as f:
         writer = csv.writer(f)
         if not file_exists:
@@ -44,6 +44,7 @@ def log_metrics(generation, archive):
             round(archive.coverage() * 100, 2),
             round(archive.best_fitness(), 4),
         ])
+    print(f"  [DEBUG] Metrics written to: {os.path.abspath(METRICS_FILE)}")
 
 
 # main loop
@@ -54,6 +55,9 @@ def main():
     print("MAP-Elites Ant Controller Evolution")
     print(f"Mode: {'MOCK (no sim)' if USE_MOCK else 'Isaac Sim'}")
     print(f"Generations: {MAX_GENERATIONS} | Population per gen: {POPULATION_SIZE}")
+    print(f"[DEBUG] Working directory: {os.getcwd()}")
+    print(f"[DEBUG] Archive will save to: {os.path.abspath(ARCHIVE_FILE)}")
+    print(f"[DEBUG] Metrics will save to: {os.path.abspath(METRICS_FILE)}")
     print("=" * 60)
 
     # set up components
@@ -61,6 +65,7 @@ def main():
     sim = Simulation(num_envs=POPULATION_SIZE, episode_length=200, use_mock=USE_MOCK)
 
     # try loading a previous archive if one exists
+    print(f"[DEBUG] Attempting to load archive from: {os.path.abspath(ARCHIVE_FILE)}")
     archive.load(ARCHIVE_FILE)
 
     # generation Loop
@@ -106,7 +111,9 @@ def main():
 
         # evaluate all controllers in simulation
         # sends all 5 controllers to the sim at same time. Or parallel computing
+        print(f"  [DEBUG] Evaluating {len(controllers)} controllers...")
         results = sim.evaluate(controllers, device=device)
+        print(f"  [DEBUG] Got {len(results)} results: {results}")
 
         # update archive with results
         for genome, (fitness, x, y) in zip(genomes, results):
@@ -127,7 +134,9 @@ def main():
     print(f"Final coverage: {archive.coverage():.1%}")
     print(f"Best fitness (lowest energy): {archive.best_fitness():.4f}")
 
+    print(f"\n[DEBUG] Saving archive to: {os.path.abspath(ARCHIVE_FILE)}")
     archive.save(ARCHIVE_FILE)
+    print(f"[DEBUG] Archive file exists: {os.path.exists(ARCHIVE_FILE)}, size: {os.path.getsize(ARCHIVE_FILE)} bytes")
 
     print("\nFiles saved:")
     print("  archive_final.png   — heatmap of archive")
