@@ -139,10 +139,9 @@ def main():
     print(f"[DEBUG] Archive file exists: {os.path.exists(ARCHIVE_FILE)}, size: {os.path.getsize(ARCHIVE_FILE)} bytes")
 
     print("\nFiles saved:")
-    print("  archive_final.png   — heatmap of archive")
-    print("  metrics_final.png   — coverage and fitness graphs")
-    print(f"  {ARCHIVE_FILE}         — saved archive data")
-    print(f"  {METRICS_FILE}  — raw metrics log")
+    print(f"  {os.path.abspath(ARCHIVE_FILE)} (exists: {os.path.exists(ARCHIVE_FILE)})")
+    print(f"  {os.path.abspath(METRICS_FILE)} (exists: {os.path.exists(METRICS_FILE)})")
+    print("  [NOTE] archive_final.png and metrics_final.png not yet generated (visualisation not implemented)")
 
 
 if __name__ == "__main__":
