@@ -115,6 +115,7 @@ def main():
                 print(f"  New elite | cell: {archive.get_cell(x, y)} | energy: {fitness:.4f} | pos: ({x:.2f}, {y:.2f})")
 
         # log and visualise
+        log_metrics(generation, archive)
 
         # TODO - visualise archive
         # something(archive)
@@ -125,6 +126,8 @@ def main():
     print(f"Final archive: {archive.filled_cells()}/100 cells filled")
     print(f"Final coverage: {archive.coverage():.1%}")
     print(f"Best fitness (lowest energy): {archive.best_fitness():.4f}")
+
+    archive.save(ARCHIVE_FILE)
 
     print("\nFiles saved:")
     print("  archive_final.png   — heatmap of archive")
