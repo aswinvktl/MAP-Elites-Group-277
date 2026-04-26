@@ -18,7 +18,7 @@ from simulation import Simulation
 ## these values are set as constants for now, which you can change based on the sim and the results you get
 MAX_GENERATIONS = 100
 POPULATION_SIZE = 5        # number of controllers evaluated per generation
-USE_MOCK = True            # set to *false* when running with isaac Sim. for kip and david, this is me blind coding
+USE_MOCK = False           # set to *false* when running with isaac Sim. for kip and david, this is me blind coding
 METRICS_FILE = "map_elites_metrics.csv"
 ARCHIVE_FILE = "archive.json"
 
