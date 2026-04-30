@@ -146,10 +146,9 @@ class Simulation:
         for i in range(num_controllers):
             final_x = root_pos[i, 0].item()
             final_y = root_pos[i, 1].item()
-            avg_energy = total_energy / self.episode_length
+            avg_energy = (total_energy[i] / self.episode_length).item()
             distance = (final_x**2 + final_y**2)**0.5
-            fitness = 10 * distance - 0.1 * avg_energy
-            print(fitness)
+            fitness =  distance - 0.1 * avg_energy
             print(f"  [SIM] Controller {i+1}: energy={avg_energy:.4f}, pos=({final_x:.2f}, {final_y:.2f})")
             results.append((fitness, final_x, final_y))
 
