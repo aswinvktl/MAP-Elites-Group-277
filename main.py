@@ -130,9 +130,6 @@ def main():
         os.makedirs("visualisation-data", exist_ok=True)
         file_exists = os.path.exists(VISUALISATION_FILE)
 
-        # Debug checks if inserted equals true or false
-        print(f"[DEBUG] Inserted? {inserted}")
-        
         with open(VISUALISATION_FILE, "a", newline="") as f:
             writer = csv.writer(f)
 
