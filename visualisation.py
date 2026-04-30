@@ -10,6 +10,7 @@ import seaborn as sns
 import numpy as np
 import csv
 import os
+from pathlib import Path
 
 
 def load_data(filename, has_header=False):
@@ -109,7 +110,8 @@ def plot_scatter_graph(parsed, filename):
 
 
 def main():
-    filename = "visualisation-data/visual_data.csv"
+    REPO_DIR = Path(__file__).parent
+    filename = REPO_DIR / "visualisation-data" / "visual_data.csv"
 
     parsed = load_data(filename, has_header=True)
     grid = build_grid(parsed)
