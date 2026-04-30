@@ -111,7 +111,7 @@ def plot_scatter_graph(parsed, filename):
 def main():
     filename = "visualisation-data/visual_data.csv"
 
-    parsed = load_data(filename, has_header=False)
+    parsed = load_data(filename, has_header=True)
     grid = build_grid(parsed)
     plot_heatmap(grid, filename)
     plot_scatter_graph(parsed, filename)
