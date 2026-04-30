@@ -92,18 +92,20 @@ def plot_scatter_graph(parsed, out_dir, name):
     print(f"  [VIS] Scatter graph saved to: {os.path.abspath(output_path)}")
 
 
-def main():
-    # Find the most recent run folder inside results/
-    REPO_DIR = Path(__file__).parent
-    results_dir = REPO_DIR / "results"
+def main(run_dir=None):
+    if run_dir is None:
+        # fallback to old behaviour (optional but nice)
+        REPO_DIR = Path(__file__).parent
+        results_dir = REPO_DIR / "results"
 
-    run_folders = sorted(results_dir.iterdir(), reverse=True)
-    if not run_folders:
-        print("[VIS] No run folders found in results/")
-        return
+        run_folders = sorted(results_dir.iterdir(), reverse=True)
+        if not run_folders:
+            print("[VIS] No run folders found in results/")
+            return
 
-    latest_run = run_folders[0]
-    vis_dir = latest_run / "visualisation-data"
+        run_dir = run_folders[0]
+
+    vis_dir = Path(run_dir) / "visualisation-data"
     filename = vis_dir / "visual_data.csv"
 
     print(f"[VIS] Reading data from: {os.path.abspath(filename)}")
