@@ -13,8 +13,8 @@ from archive import Archive
 from simulation import Simulation, args
 from simulation import simulation_app
 
-MAX_GENERATIONS = 100
-POPULATION_SIZE = 40
+MAX_GENERATIONS = 2
+POPULATION_SIZE = 10
 USE_MOCK = False
 
 # saves everything into results/ inside the repo so it works for everyone
