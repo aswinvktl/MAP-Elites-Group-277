@@ -135,6 +135,7 @@ def main():
         VISUALISATION_FILE.parent.mkdir(parents=True, exist_ok=True)
         file_exists = os.path.exists(VISUALISATION_FILE)
 
+        
         if not os.path.exists(VISUALISATION_FILE):
                 with open(VISUALISATION_FILE, "w", newline="") as f:
                     writer = csv.writer(f)
