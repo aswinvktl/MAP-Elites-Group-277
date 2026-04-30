@@ -1,0 +1,8 @@
+# Generated output files
+archive.json
+map_elites_metrics.csv
+visualisation-data/visual_data.csv
+
+# Python
+__pycache__/
+*.pyc

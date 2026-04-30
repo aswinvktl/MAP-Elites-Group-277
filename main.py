@@ -7,6 +7,7 @@ ADD PRINT STATEMENTS TO SEE WHAT IS HAPPENING, also TEST CODE
 import torch
 import csv
 import os
+from pathlib import Path
 from datetime import datetime
 
 from controller import Controller
@@ -23,9 +24,13 @@ from simulation import simulation_app
 MAX_GENERATIONS = 100
 POPULATION_SIZE = 40       # number of controllers evaluated per generation
 USE_MOCK = False            # set to *false* when running with isaac Sim. for kip and david, this is me blind coding
-METRICS_FILE = "map_elites_metrics.csv"
-ARCHIVE_FILE = "archive.json"
-VISUALISATION_FILE = "visualisation-data/visual_data.csv"
+
+# All output files are saved inside the repo folder, next to main.py,
+# so they land in the same place regardless of where the script is run from.
+REPO_DIR = Path(__file__).parent
+METRICS_FILE = REPO_DIR / "map_elites_metrics.csv"
+ARCHIVE_FILE = REPO_DIR / "archive.json"
+VISUALISATION_FILE = REPO_DIR / "visualisation-data" / "visual_data.csv"
 
 
 # logging
@@ -127,7 +132,7 @@ def main():
         print(f"  [DEBUG] Got {len(results)} results: {results}")
 
         # Ensures visualisation-data folder and visual_data file exists
-        os.makedirs("visualisation-data", exist_ok=True)
+        VISUALISATION_FILE.parent.mkdir(parents=True, exist_ok=True)
         file_exists = os.path.exists(VISUALISATION_FILE)
 
         if not os.path.exists(VISUALISATION_FILE):
