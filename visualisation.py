@@ -1,7 +1,9 @@
 """
 Visualisation.py
 
+Take in data from a csv file filled with data from the main script, parses it into a readable format then builds a grid with that parsed data.
 
+It uses the newly built grid to plot a scatter graph and a heatmap.
 """
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -101,7 +103,7 @@ def plot_scatter_graph(parsed, filename):
     plt.colorbar(label='Energy')
     plt.xlabel('Pos X')
     plt.ylabel('Pos Y')
-    plt.title('Energy Scatter Plot')
+    plt.title('Scatter Graph')
     plt.savefig(f"visualisation-data/Scatter_Graph_{name}.png", dpi=300, bbox_inches='tight')
     plt.close()
 
