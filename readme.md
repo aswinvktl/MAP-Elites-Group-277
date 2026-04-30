@@ -23,8 +23,8 @@ You will implement a container solution, e.g. Docker or Apptainer, that will be 
      Access to a physical version of the Hexapod Qutier, implemented following the Qutee robot from Imperial College.
 
 # Contacts
-  Client: Simon Smith
-  Sponsor: Leni Le Goff
+     Client: Simon Smith
+     Sponsor: Leni Le Goff
 
 # Requirements
      Run in terminal "pip install -r requirements.txt" to install needed imports
