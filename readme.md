@@ -26,3 +26,5 @@ You will implement a container solution, e.g. Docker or Apptainer, that will be 
   Client: Simon Smith
   Sponsor: Leni Le Goff
 
+# Requirements
+     Run in terminal "pip install -r requirements.txt" to install needed imports
