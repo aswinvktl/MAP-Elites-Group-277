@@ -130,11 +130,13 @@ def main():
         os.makedirs("visualisation-data", exist_ok=True)
         file_exists = os.path.exists(VISUALISATION_FILE)
 
+        if not os.path.exists(VISUALISATION_FILE):
+                with open(VISUALISATION_FILE, "w", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(["Generation", "Cell", "Fitness", "X", "Y"])
+
         with open(VISUALISATION_FILE, "a", newline="") as f:
             writer = csv.writer(f)
-
-            if not file_exists:
-                writer.writerow(["Generation", "Cell", "Fitness", "X", "Y"])
 
             # update archive with results
             for genome, (fitness, x, y) in zip(genomes, results):
