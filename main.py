@@ -19,21 +19,21 @@ POPULATION_SIZE = 250
 USE_MOCK = False
 
 # saves everything into results/ inside the repo so it works for everyone
-REPO_DIR = Path(__file__).parent
-RUN_DIR = REPO_DIR / "results" / datetime.now().strftime("run_%Y-%m-%d_%H-%M-%S")
+REPO_DIR = Path(__file__).parent #this is the root directory for the script 
+RUN_DIR = REPO_DIR / "results" / datetime.now().strftime("run_%Y-%m-%d_%H-%M-%S") 
 RUN_DIR.mkdir(parents=True, exist_ok=True)
 
 METRICS_FILE = RUN_DIR / "metrics.csv"
 ARCHIVE_FILE = RUN_DIR / "archive.json"
-VISUALISATION_FILE = RUN_DIR / "visualisation-data" / "visual_data.csv"
+VISUALISATION_FILE = RUN_DIR / "visualisation-data" / "visual_data.csv" #stores the data 
 
 # writes one row to the csv after every generation
 def log_metrics(generation, archive):
-    file_exists = METRICS_FILE.exists()
-    with open(METRICS_FILE, "a", newline="") as f:
+    file_exists = METRICS_FILE.exists() # this checks to see if the file already exists 
+    with open(METRICS_FILE, "a", newline="") as f: #openes file in appended mode 
         writer = csv.writer(f)
-        if not file_exists:
-            writer.writerow(["Generation", "Filled_Cells", "Coverage_%", "Best_Fitness"])
+        if not file_exists: #if the file does not exist it will write a header row 
+            writer.writerow(["Generation", "Filled_Cells", "Coverage_%", "Best_Fitness"]) #stores the data here 
         writer.writerow([
             generation,
             archive.filled_cells(),
@@ -55,9 +55,9 @@ def get_previous_archived_run(repo_dir, current_run_dir):
         return None
 
     run_dirs.sort()
-    latest_run = run_dirs[-1]
+    latest_run = run_dirs[-1] #it will get the most recent run 
 
-    archive_path = latest_run / "archive.json"
+    archive_path = latest_run / "archive.json" # the path to the saved archive file 
     return archive_path if archive_path.exists() else None
 
 
@@ -74,18 +74,18 @@ def main():
     print(f"[PATHS] Visualisation data:  {os.path.abspath(VISUALISATION_FILE)}")
     print("=" * 60)
 
-    archive = Archive(grid_size=10, x_range=(-5.0, 5.0), y_range=(-5.0, 5.0))
+    archive = Archive(grid_size=10, x_range=(-5.0, 5.0), y_range=(-5.0, 5.0)) # creates the 10x10 grid
     sim = Simulation(num_envs=args.num_envs, episode_length=200, use_mock=USE_MOCK)
 
     # load previous archive if there is one, otherwise starts fresh
     prev_archive = get_previous_archived_run(REPO_DIR, RUN_DIR)
 
     if prev_archive is not None:
-        archive.load(prev_archive)
+        archive.load(prev_archive) #will try run the prevoius run 
     else:
         print("No previous archive found, starting fresh.")    
 
-    generation = 1
+    generation = 1 #starts at genertion 1 
 
     while simulation_app.is_running() and generation < MAX_GENERATIONS:
         print(f"\n--- Generation {generation}/{MAX_GENERATIONS} ---")
@@ -103,8 +103,8 @@ def main():
                 parent1.set_genome(g1.to(device))
                 parent2 = Controller()
                 parent2.set_genome(g2.to(device))
-                child = Controller.crossover(parent1, parent2)
-                child = child.mutate()
+                child = Controller.crossover(parent1, parent2) #combines the geonomes 
+                child = child.mutate() #adds the mustaion
             elif g1 is not None:
                 # one parent, just mutate
                 parent = Controller()
