@@ -15,7 +15,7 @@ You will implement a container solution, e.g. Docker or Apptainer, that will be 
       A training policy for the MAP-Elites algorithms resulted in a control for the robot.
       A set of diagrams with the learning performance using Tensorboard.
       Code and documentation uploaded to our Git server.
-
+ 
 # Resources Available
      Access to the Napier HPC.
      URDF file that defines the robot inside the simulation.
@@ -27,4 +27,4 @@ You will implement a container solution, e.g. Docker or Apptainer, that will be 
      Sponsor: Leni Le Goff
 
 # Requirements
-     Run in terminal "pip install -r requirements.txt" to install needed imports
+     Run in terminal "pip install -r requirements.txt" to install needed imports      
