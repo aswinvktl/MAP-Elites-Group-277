@@ -111,42 +111,45 @@ class Simulation:
 
     def _run_real(self, controllers, device):
         """
-        Real Isaac Sim evaluation. Runs one controller at a time (each uses all num_envs slots
-        for parallel rollouts, averaged to a single result).
+        Real Isaac Sim evaluation. Runs all controllers in parallel,
+        one controller per environment.
         """
+        num_controllers = len(controllers)
+        assert num_controllers <= self.num_envs, \
+            f"Not enough envs ({self.num_envs}) for controllers ({num_controllers})"
+
+        print(f"  [SIM] Evaluating {num_controllers} controllers in parallel...")
+
+        obs_dict, _ = self.env.reset()
+        total_energy = torch.zeros(num_controllers, device=device)
+
+        for step in range(self.episode_length):
+            joint_angles = obs_dict["policy"][:num_controllers, 12:20].to(device)
+
+            actions = torch.stack([
+                controllers[i](joint_angles[i].unsqueeze(0)).squeeze(0)
+                for i in range(num_controllers)
+            ])
+
+            if num_controllers < self.num_envs:
+                padding = torch.zeros(self.num_envs - num_controllers, 8, device=device)
+                actions_padded = torch.cat([actions, padding], dim=0)
+            else:
+                actions_padded = actions
+
+            obs_dict, _, terminated, truncated, info = self.env.step(actions_padded)
+            total_energy += torch.abs(actions).mean(dim=1)
+
+        root_pos = self.env.unwrapped.scene["robot"].data.root_pos_w
+
         results = []
-
-        for idx, controller in enumerate(controllers):
-            print(f"  [SIM] Evaluating controller {idx + 1}/{len(controllers)}...")
-            obs_dict, _ = self.env.reset()
-
-            total_energy = 0.0
-
-            for step in range(self.episode_length):
-                # Joint angles are at indices 12:20 in the policy observation
-                joint_angles = obs_dict["policy"][:, 12:20].to(device)  # shape: (num_envs, 8)
-
-                with torch.no_grad():
-                    actions = controller(joint_angles)  # shape: (num_envs, 8)
-
-                obs_dict, _, terminated, truncated, info = self.env.step(actions)
-
-                # Energy = mean absolute joint torque/velocity across envs and joints
-                total_energy += torch.abs(actions).mean().item()
-
-
-            # Final x, y position of the ant (averaged across envs)
-            # root_pos_w is the world-frame root position: shape (num_envs, 3)
-            root_pos = self.env.unwrapped.scene["robot"].data.root_pos_w  # (num_envs, 3)
-            final_x = root_pos[:, 0].mean().item()
-            final_y = root_pos[:, 1].mean().item()
-            
-            avg_energy = total_energy / self.episode_length
+        for i in range(num_controllers):
+            final_x = root_pos[i, 0].item()
+            final_y = root_pos[i, 1].item()
+            avg_energy = (total_energy[i] / self.episode_length).item()
             distance = (final_x**2 + final_y**2)**0.5
             fitness = 10 * distance - 0.1 * avg_energy
-            print(fitness)
-
-            print(f"  [SIM] Controller {idx + 1}: energy={avg_energy:.4f}, pos=({final_x:.2f}, {final_y:.2f})")
+            print(f"  [SIM] Controller {i+1}: energy={avg_energy:.4f}, pos=({final_x:.2f}, {final_y:.2f})")
             results.append((fitness, final_x, final_y))
 
         return results
