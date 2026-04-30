@@ -7,3 +7,5 @@ __inspectionProfiles__/
 # Python
 __pycache__/
 *.pyc
+# ide
+.ai/
