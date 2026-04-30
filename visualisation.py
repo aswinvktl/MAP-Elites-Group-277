@@ -109,7 +109,7 @@ def plot_scatter_graph(parsed, filename):
 
 
 def main():
-    filename = "visualisation-data/map_elites_metrics.csv"
+    filename = "visualisation-data/visual_data.csv"
 
     parsed = load_data(filename, has_header=False)
     grid = build_grid(parsed)

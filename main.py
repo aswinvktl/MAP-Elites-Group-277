@@ -63,6 +63,7 @@ def main():
     print(f"[DEBUG] Working directory: {os.getcwd()}")
     print(f"[DEBUG] Archive will save to: {os.path.abspath(ARCHIVE_FILE)}")
     print(f"[DEBUG] Metrics will save to: {os.path.abspath(METRICS_FILE)}")
+    print(f"[DEBUG] Visualisation Data will save to: {os.path.abspath(VISUALISATION_FILE)}")
     print("=" * 60)
 
     # set up components
@@ -125,13 +126,20 @@ def main():
         results = sim.evaluate(controllers, device=device)
         print(f"  [DEBUG] Got {len(results)} results: {results}")
 
-        # Ensures visualisation-data folder exists
+        # Ensures visualisation-data folder and visual_data file exists
         os.makedirs("visualisation-data", exist_ok=True)
+        file_exists = os.path.exists(VISUALISATION_FILE)
 
+        # Debug checks if inserted equals true or false
+        print(f"[DEBUG] Inserted? {inserted}")
+        
         with open(VISUALISATION_FILE, "a", newline="") as f:
             writer = csv.writer(f)
 
-             # update archive with results
+            if not file_exists:
+                writer.writerow(["Generation", "Cell", "Fitness", "X", "Y"])
+
+            # update archive with results
             for genome, (fitness, x, y) in zip(genomes, results):
                 inserted = archive.insert(genome, fitness, x, y)
 
@@ -139,6 +147,7 @@ def main():
                     cell = archive.get_cell(x, y)
 
                     print(f"  New elite | cell: {cell} | energy: {fitness:.4f} | pos: ({x:.2f}, {y:.2f})")
+                    print("Writing row...")
 
                     # Writes data to a csv file
                     writer.writerow([
@@ -172,6 +181,7 @@ def main():
     print("\nFiles saved:")
     print(f"  {os.path.abspath(ARCHIVE_FILE)} (exists: {os.path.exists(ARCHIVE_FILE)})")
     print(f"  {os.path.abspath(METRICS_FILE)} (exists: {os.path.exists(METRICS_FILE)})")
+    print(f"  {os.path.abspath(VISUALISATION_FILE)} (exists: {os.path.exists(VISUALISATION_FILE)})")
     print("  [NOTE] archive_final.png and metrics_final.png not yet generated (visualisation not implemented)")
     
 
