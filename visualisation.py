@@ -11,7 +11,7 @@ import csv
 import os
 from pathlib import Path
 
-
+# Loads the data from the specificed file in main, strips the code and parses the data into a new variable
 def load_data(filename, has_header=False):
     parsed = []
 
@@ -39,6 +39,7 @@ def load_data(filename, has_header=False):
     return parsed
 
 
+# Takes the parsed data and builds out grid points for use in the heatmap and graphs
 def build_grid(parsed):
     if not parsed:
         raise ValueError("No valid data found in CSV")
@@ -64,6 +65,7 @@ def build_grid(parsed):
     return grid
 
 
+# Uses the newly built grid and plots out a heatmap
 def plot_heatmap(grid, out_dir, name):
     output_path = out_dir / f"Heatmap_{name}.png"
     sns.heatmap(grid[::-1], cmap="viridis", cbar_kws={'label': 'Energy'})
@@ -75,6 +77,7 @@ def plot_heatmap(grid, out_dir, name):
     print(f"  [VIS] Heatmap saved to: {os.path.abspath(output_path)}")
 
 
+# Uses the newly built grid and plots out a scatter graph
 def plot_scatter_graph(parsed, out_dir, name):
     output_path = out_dir / f"Scatter_Graph_{name}.png"
 
@@ -92,6 +95,7 @@ def plot_scatter_graph(parsed, out_dir, name):
     print(f"  [VIS] Scatter graph saved to: {os.path.abspath(output_path)}")
 
 
+# Main
 def main(run_dir=None):
     if run_dir is None:
         # fallback to old behaviour (optional but nice)
