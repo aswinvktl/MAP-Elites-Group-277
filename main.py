@@ -42,7 +42,7 @@ def log_metrics(generation, archive):
         ])
     print(f"  [METRICS] Generation {generation} written to: {os.path.abspath(METRICS_FILE)}")
 
-
+# to find previous runs and start from there
 def get_previous_archived_run(repo_dir, current_run_dir):
     results_dir = repo_dir / "results"
 
