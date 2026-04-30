@@ -27,7 +27,6 @@ METRICS_FILE = RUN_DIR / "metrics.csv"
 ARCHIVE_FILE = RUN_DIR / "archive.json"
 VISUALISATION_FILE = RUN_DIR / "visualisation-data" / "visual_data.csv"
 
-
 # writes one row to the csv after every generation
 def log_metrics(generation, archive):
     file_exists = METRICS_FILE.exists()
@@ -42,6 +41,24 @@ def log_metrics(generation, archive):
             round(archive.best_fitness(), 4),
         ])
     print(f"  [METRICS] Generation {generation} written to: {os.path.abspath(METRICS_FILE)}")
+
+
+def get_previous_archived_run(repo_dir, current_run_dir):
+    results_dir = repo_dir / "results"
+
+    run_dirs = [
+        d for d in results_dir.iterdir()
+        if d.is_dir() and d.name.startswith("run_") and d != current_run_dir
+    ]
+
+    if not run_dirs:
+        return None
+
+    run_dirs.sort()
+    latest_run = run_dirs[-1]
+
+    archive_path = latest_run / "archive.json"
+    return archive_path if archive_path.exists() else None
 
 
 def main():
@@ -61,7 +78,12 @@ def main():
     sim = Simulation(num_envs=args.num_envs, episode_length=200, use_mock=USE_MOCK)
 
     # load previous archive if there is one, otherwise starts fresh
-    archive.load(ARCHIVE_FILE)
+    prev_archive = get_previous_archived_run(REPO_DIR, RUN_DIR)
+
+    if prev_archive is not None:
+        archive.load(prev_archive)
+    else:
+        print("No previous archive found, starting fresh.")    
 
     generation = 1
 
