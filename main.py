@@ -25,6 +25,7 @@ POPULATION_SIZE = 40       # number of controllers evaluated per generation
 USE_MOCK = False            # set to *false* when running with isaac Sim. for kip and david, this is me blind coding
 METRICS_FILE = "map_elites_metrics.csv"
 ARCHIVE_FILE = "archive.json"
+VISUALISATION_FILE = "visualisation-data/visual_data.csv"
 
 
 # logging
@@ -124,11 +125,24 @@ def main():
         results = sim.evaluate(controllers, device=device)
         print(f"  [DEBUG] Got {len(results)} results: {results}")
 
+        # Ensures visualisation-data folder exists
+        os.makedirs("visualisation-data", exist_ok=True)
+
         # update archive with results
         for genome, (fitness, x, y) in zip(genomes, results):
             inserted = archive.insert(genome, fitness, x, y)
             if inserted:
                 print(f"  New elite | cell: {archive.get_cell(x, y)} | energy: {fitness:.4f} | pos: ({x:.2f}, {y:.2f})")
+
+                # Saves the data into the visual_data file
+                with open(VISUALISATION_FILE, "a", newline="") as f:
+                    writer = csv.writer(f)
+                    writer.writerow([
+                        archive.get_cell(x, y),
+                        round(fitness, 4),
+                        round(x, 2),
+                        round(y, 2),
+                    ])
 
         # log and visualise
         log_metrics(generation, archive)
