@@ -27,7 +27,6 @@ METRICS_FILE = RUN_DIR / "metrics.csv"
 ARCHIVE_FILE = RUN_DIR / "archive.json"
 VISUALISATION_FILE = RUN_DIR / "visualisation-data" / "visual_data.csv"
 
-
 # writes one row to the csv after every generation
 def log_metrics(generation, archive):
     file_exists = METRICS_FILE.exists()
