@@ -138,10 +138,10 @@ def main():
         if not os.path.exists(VISUALISATION_FILE):
                 with open(VISUALISATION_FILE, "w", newline="") as f:
                     writer = csv.writer(f)
-                    writer.writerow(["Generation", "Cell", "Fitness", "X", "Y"])
 
         with open(VISUALISATION_FILE, "a", newline="") as f:
             writer = csv.writer(f)
+            writer.writerow(["Generation", "Cell", "Fitness", "X", "Y"])
 
             # update archive with results
             for genome, (fitness, x, y) in zip(genomes, results):
@@ -151,7 +151,6 @@ def main():
                     cell = archive.get_cell(x, y)
 
                     print(f"  New elite | cell: {cell} | energy: {fitness:.4f} | pos: ({x:.2f}, {y:.2f})")
-                    print("Writing row...")
 
                     # Writes data to a csv file
                     writer.writerow([
