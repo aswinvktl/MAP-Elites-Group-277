@@ -14,8 +14,8 @@ from simulation import Simulation, args
 from simulation import simulation_app
 import visualisation
 
-MAX_GENERATIONS = 2
-POPULATION_SIZE = 500
+MAX_GENERATIONS = 10
+POPULATION_SIZE = 250
 USE_MOCK = False
 
 # saves everything into results/ inside the repo so it works for everyone
