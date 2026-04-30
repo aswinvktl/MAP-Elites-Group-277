@@ -128,17 +128,22 @@ def main():
         # Ensures visualisation-data folder exists
         os.makedirs("visualisation-data", exist_ok=True)
 
-        # update archive with results
-        for genome, (fitness, x, y) in zip(genomes, results):
-            inserted = archive.insert(genome, fitness, x, y)
-            if inserted:
-                print(f"  New elite | cell: {archive.get_cell(x, y)} | energy: {fitness:.4f} | pos: ({x:.2f}, {y:.2f})")
+        with open(VISUALISATION_FILE, "a", newline="") as f:
+            writer = csv.writer(f)
 
-                # Saves the data into the visual_data file
-                with open(VISUALISATION_FILE, "a", newline="") as f:
-                    writer = csv.writer(f)
+             # update archive with results
+            for genome, (fitness, x, y) in zip(genomes, results):
+                inserted = archive.insert(genome, fitness, x, y)
+
+                if inserted:
+                    cell = archive.get_cell(x, y)
+
+                    print(f"  New elite | cell: {cell} | energy: {fitness:.4f} | pos: ({x:.2f}, {y:.2f})")
+
+                    # Writes data to a csv file
                     writer.writerow([
-                        archive.get_cell(x, y),
+                        generation,
+                        f"({cell[0]},{cell[1]})",
                         round(fitness, 4),
                         round(x, 2),
                         round(y, 2),
