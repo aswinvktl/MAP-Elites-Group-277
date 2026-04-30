@@ -1,7 +1,5 @@
 """
-Main file, just tells every file what to do
-
-ADD PRINT STATEMENTS TO SEE WHAT IS HAPPENING, also TEST CODE
+main file, coordinates everything
 """
 
 import torch
@@ -13,37 +11,25 @@ from datetime import datetime
 from controller import Controller
 from archive import Archive
 from simulation import Simulation, args
-
-
-
-#added simulation, not only simulation.py needs it this does as well
 from simulation import simulation_app
-# from visualisation import something
 
-## these values are set as constants for now, which you can change based on the sim and the results you get
 MAX_GENERATIONS = 100
-POPULATION_SIZE = 40       # number of controllers evaluated per generation
-USE_MOCK = False            # set to *false* when running with isaac Sim. for kip and david, this is me blind coding
+POPULATION_SIZE = 40
+USE_MOCK = False
 
-# All output files are saved inside the repo folder, next to main.py,
-# so they land in the same place regardless of where the script is run from.
+# saves everything into results/ inside the repo so it works for everyone
 REPO_DIR = Path(__file__).parent
-METRICS_FILE = REPO_DIR / "map_elites_metrics.csv"
-ARCHIVE_FILE = REPO_DIR / "archive.json"
-VISUALISATION_FILE = REPO_DIR / "visualisation-data" / "visual_data.csv"
+RUN_DIR = REPO_DIR / "results" / datetime.now().strftime("run_%Y-%m-%d_%H-%M-%S")
+RUN_DIR.mkdir(parents=True, exist_ok=True)
+
+METRICS_FILE = RUN_DIR / "metrics.csv"
+ARCHIVE_FILE = RUN_DIR / "archive.json"
+VISUALISATION_FILE = RUN_DIR / "visualisation-data" / "visual_data.csv"
 
 
-# logging
-
-# after every generation, write one row to CSV file
+# writes one row to the csv after every generation
 def log_metrics(generation, archive):
-    """Write one row to the CSV log."""
-    file_exists = False
-    try:
-        with open(METRICS_FILE, "r") as f:
-            file_exists = len(f.readlines()) > 0
-    except FileNotFoundError:
-        pass
+    file_exists = METRICS_FILE.exists()
     with open(METRICS_FILE, "a", newline="") as f:
         writer = csv.writer(f)
         if not file_exists:
@@ -54,10 +40,9 @@ def log_metrics(generation, archive):
             round(archive.coverage() * 100, 2),
             round(archive.best_fitness(), 4),
         ])
-    print(f"  [DEBUG] Metrics written to: {os.path.abspath(METRICS_FILE)}")
+    print(f"  [METRICS] Generation {generation} written to: {os.path.abspath(METRICS_FILE)}")
 
 
-# main loop
 def main():
     device = torch.device("cuda")
 
@@ -65,46 +50,32 @@ def main():
     print("MAP-Elites Ant Controller Evolution")
     print(f"Mode: {'MOCK (no sim)' if USE_MOCK else 'Isaac Sim'}")
     print(f"Generations: {MAX_GENERATIONS} | Population per gen: {POPULATION_SIZE}")
-    print(f"[DEBUG] Working directory: {os.getcwd()}")
-    print(f"[DEBUG] Archive will save to: {os.path.abspath(ARCHIVE_FILE)}")
-    print(f"[DEBUG] Metrics will save to: {os.path.abspath(METRICS_FILE)}")
-    print(f"[DEBUG] Visualisation Data will save to: {os.path.abspath(VISUALISATION_FILE)}")
+    print(f"[PATHS] Run folder:          {os.path.abspath(RUN_DIR)}")
+    print(f"[PATHS] Archive:             {os.path.abspath(ARCHIVE_FILE)}")
+    print(f"[PATHS] Metrics:             {os.path.abspath(METRICS_FILE)}")
+    print(f"[PATHS] Visualisation data:  {os.path.abspath(VISUALISATION_FILE)}")
     print("=" * 60)
 
-    # set up components
     archive = Archive(grid_size=10, x_range=(-5.0, 5.0), y_range=(-5.0, 5.0))
     sim = Simulation(num_envs=args.num_envs, episode_length=200, use_mock=USE_MOCK)
 
-    # try loading a previous archive if one exists
-    print(f"[DEBUG] Attempting to load archive from: {os.path.abspath(ARCHIVE_FILE)}")
+    # load previous archive if there is one, otherwise starts fresh
     archive.load(ARCHIVE_FILE)
 
-    # generation Loop
-    # run for 100 times and everything happens once per generation
-    
-    
-    #set first generation 
     generation = 1
-    
+
     while simulation_app.is_running() and generation < MAX_GENERATIONS:
         print(f"\n--- Generation {generation}/{MAX_GENERATIONS} ---")
         print(f"Archive: {archive.filled_cells()}/100 cells | Coverage: {archive.coverage():.1%}")
 
-        # create or evolve POPULATION_SIZE controllers
         controllers = []
         genomes = []
-
-        """
-        Archive has 2+ controllers Pick two, crossover, then mutate
-        Archive has 1 controllerPick one, mutate it
-        Archive is emptyCreate a completely random controller
-        """
 
         for _ in range(POPULATION_SIZE):
             g1, g2 = archive.sample_two()
 
             if g1 is not None and g2 is not None:
-                # if two parents exist then crossover then mutate
+                # two parents, crossover then mutate
                 parent1 = Controller()
                 parent1.set_genome(g1.to(device))
                 parent2 = Controller()
@@ -117,7 +88,7 @@ def main():
                 parent.set_genome(g1.to(device))
                 child = parent.mutate()
             else:
-                # if archive empty create random controller
+                # archive is empty so make a random controller
                 child = Controller.random()
 
             child = child.to(device)
@@ -125,35 +96,28 @@ def main():
             controllers.append(child)
             genomes.append(genome)
 
-        # evaluate all controllers in simulation
-        # sends all 5 controllers to the sim at same time. Or parallel computing
-        print(f"  [DEBUG] Evaluating {len(controllers)} controllers...")
+        print(f"  [SIM] Evaluating {len(controllers)} controllers...")
         results = sim.evaluate(controllers, device=device)
-        print(f"  [DEBUG] Got {len(results)} results: {results}")
+        print(f"  [SIM] Got {len(results)} results")
 
-        # Ensures visualisation-data folder and visual_data file exists
+        # make sure the visualisation folder exists before writing
         VISUALISATION_FILE.parent.mkdir(parents=True, exist_ok=True)
-        file_exists = os.path.exists(VISUALISATION_FILE)
 
-        if not os.path.exists(VISUALISATION_FILE):
-                with open(VISUALISATION_FILE, "w", newline="") as f:
-                    writer = csv.writer(f)
-                    writer.writerow(["Generation", "Cell", "Fitness", "X", "Y"])
+        if not VISUALISATION_FILE.exists():
+            with open(VISUALISATION_FILE, "w", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow(["Generation", "Cell", "Fitness", "X", "Y"])
 
         with open(VISUALISATION_FILE, "a", newline="") as f:
             writer = csv.writer(f)
 
-            # update archive with results
+            # update archive and write new elites to csv
             for genome, (fitness, x, y) in zip(genomes, results):
                 inserted = archive.insert(genome, fitness, x, y)
 
                 if inserted:
                     cell = archive.get_cell(x, y)
-
-                    print(f"  New elite | cell: {cell} | energy: {fitness:.4f} | pos: ({x:.2f}, {y:.2f})")
-                    print("Writing row...")
-
-                    # Writes data to a csv file
+                    print(f"  [ELITE] cell: {cell} | fitness: {fitness:.4f} | pos: ({x:.2f}, {y:.2f})")
                     writer.writerow([
                         generation,
                         f"({cell[0]},{cell[1]})",
@@ -162,34 +126,24 @@ def main():
                         round(y, 2),
                     ])
 
-        # log and visualise
         log_metrics(generation, archive)
-
-        # TODO - visualise archive
-        # something(archive)
-        
-        #increase generation, just leave this at the very end
         generation += 1
-
 
     print("\n" + "=" * 60)
     print("MAP-Elites Complete")
     print(f"Final archive: {archive.filled_cells()}/100 cells filled")
     print(f"Final coverage: {archive.coverage():.1%}")
-    print(f"Best fitness (lowest energy): {archive.best_fitness():.4f}")
+    print(f"Best fitness: {archive.best_fitness():.4f}")
 
-    print(f"\n[DEBUG] Saving archive to: {os.path.abspath(ARCHIVE_FILE)}")
     archive.save(ARCHIVE_FILE)
-    print(f"[DEBUG] Archive file exists: {os.path.exists(ARCHIVE_FILE)}, size: {os.path.getsize(ARCHIVE_FILE)} bytes")
 
-    print("\nFiles saved:")
-    print(f"  {os.path.abspath(ARCHIVE_FILE)} (exists: {os.path.exists(ARCHIVE_FILE)})")
-    print(f"  {os.path.abspath(METRICS_FILE)} (exists: {os.path.exists(METRICS_FILE)})")
-    print(f"  {os.path.abspath(VISUALISATION_FILE)} (exists: {os.path.exists(VISUALISATION_FILE)})")
-    print("  [NOTE] archive_final.png and metrics_final.png not yet generated (visualisation not implemented)")
-    
+    print("\n[PATHS] Files saved:")
+    print(f"  Archive:            {os.path.abspath(ARCHIVE_FILE)}")
+    print(f"  Metrics:            {os.path.abspath(METRICS_FILE)}")
+    print(f"  Visualisation data: {os.path.abspath(VISUALISATION_FILE)}")
 
     simulation_app.close()
+
 
 if __name__ == "__main__":
     main()
