@@ -15,7 +15,6 @@ class Controller(nn.Module):
 
     # fc1 = first layer of connections
     # fc2 = second layer of connections
-    # look at the explanation document in research chat
     def __init__(self):
         super(Controller, self).__init__()
         # FIXED 8 inputs, 10 hidden, 8 outputs = 160 weights
@@ -28,7 +27,7 @@ class Controller(nn.Module):
     def forward(self, x):
         x = torch.tanh(self.fc1(x))
         x = torch.tanh(self.fc2(x))
-        return x  # 8 output angles between -1 and 1
+        return x
 
 
     ''' when controller is created, it is randomly initialised with weights. 

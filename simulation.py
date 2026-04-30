@@ -14,7 +14,7 @@ args, hydra_args = parser.parse_known_args()
 app_launcher = AppLauncher(args)
 simulation_app = app_launcher.app
 
-#side note i removed if statement on my end you guys should readd it but it messed with my stuff when testing
+
 
 class Simulation:
     """

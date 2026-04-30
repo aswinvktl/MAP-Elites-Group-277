@@ -1,3 +1,9 @@
+# Caches
+__.idea__/
+__inspectionProfiles__/
+*.iml
+*.xml
+
 # Python
 __pycache__/
 *.pyc
