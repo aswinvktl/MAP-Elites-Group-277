@@ -12,9 +12,10 @@ from controller import Controller
 from archive import Archive
 from simulation import Simulation, args
 from simulation import simulation_app
+import visualisation
 
-MAX_GENERATIONS = 2
-POPULATION_SIZE = 10
+MAX_GENERATIONS = 100
+POPULATION_SIZE = 40
 USE_MOCK = False
 
 # saves everything into results/ inside the repo so it works for everyone
@@ -141,6 +142,9 @@ def main():
     print(f"  Archive:            {os.path.abspath(ARCHIVE_FILE)}")
     print(f"  Metrics:            {os.path.abspath(METRICS_FILE)}")
     print(f"  Visualisation data: {os.path.abspath(VISUALISATION_FILE)}")
+
+    print("\n[VIS] Running visualisation...")
+    visualisation.main(RUN_DIR)
 
     simulation_app.close()
 
