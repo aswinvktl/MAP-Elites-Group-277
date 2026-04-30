@@ -6,12 +6,10 @@ import torch
 class Archive:
     """
     The MAP-Elites archive.
-    A 10x10 grid. Each cell stores the most energy-efficient
+    A 10x10 grid. Each cell stores the most energy-efficient from that position
     controller found for that region of (x, y) space.
     """
-    # makes the grid. it is 10x10 and 100 cells in total.
-    # it covers from -5 to 5 in both x and y directions.
-    # these are placeholders for kip and david until you know how far the ant actually goes
+  
     def __init__(self, grid_size=10, x_range=(-5.0, 5.0), y_range=(-5.0, 5.0)):
         self.grid_size = grid_size
         self.x_range = x_range
@@ -19,16 +17,15 @@ class Archive:
 
         # Each cell stores controller genome, fitness, descriptor
         self.grid = {}
+        # this sets up the grid 
 
     def get_cell(self, x, y):
-        """Convert a real x, y position into a grid cell index.
-        It takes the real position like x = 2.3 y = -1.2 and coverts it to grid cell (2, 1)
-        It works by figuring out where the ant falls within a range and converts to a grid index between 0 and 9
-        For example, if the ant ends up at x=2.3 and y=-1.1, and the range is -5 to 5:
-        x_cell = (2.3 - (-5)) / (5 - (-5)) * 10 = 7.3  ->cell index 7
-        y_cell = (-1.1 - (-5)) / (5 - (-5)) * 10 = 3.9 ->cell index 3
+        """
+        this will turn the x and y numbers into their grid postions
+        and makes sure that the number is between 0 and 9
 
-        Resulting grid cell: (7, 3)
+
+        
         """
         x_min, x_max = self.x_range
         y_min, y_max = self.y_range
@@ -36,21 +33,21 @@ class Archive:
         i = int((x - x_min) / (x_max - x_min) * self.grid_size)
         j = int((y - y_min) / (y_max - y_min) * self.grid_size)
 
-        # Clamp to grid bounds
+        # this will calcuate which cell it woll belong to
         i = max(0, min(self.grid_size - 1, i))
         j = max(0, min(self.grid_size - 1, j))
 
         return (i, j)
 
         """
-        This is called after every ant evaluation. It does one of the two things,
-        - if cell is empty it inserts the controller into the archive
-        - if it is not empty, it replaces the one that used the less energy OR the ELITE 
+        This is called after every ant evaluation.
+         when the cell is empty, it will insert the controller to the archive 
+         when the cell is not empty, it replaces the one that used the less energy OR the ELITE 
         """
     def insert(self, genome, fitness, x, y):
         """
         add a result to the archive
-        fitness = energy used (LOWER is better)
+        fitness = energy used 
         only replaces existing if new fitness is lower
         Returns True if inserted false if rejected
         """
@@ -66,14 +63,14 @@ class Archive:
         return False
 
     def sample(self):
-        """Pick a random genome from whatever is currently stored"""
+        """this picks a random geonome from what has been saved"""
         if len(self.grid) == 0:
             return None
         cell = np.random.choice(list(self.grid.keys()))
         return self.grid[cell]["genome"]
 
     def sample_two(self):
-        """Pick two different random genomes for crossover"""
+        """this will pick 2 differnt genomes to be mixed together"""
         if len(self.grid) < 2:
             return None, None
         cells = list(self.grid.keys())
@@ -81,16 +78,16 @@ class Archive:
         g1 = self.grid[cells[chosen[0]]]["genome"]
         g2 = self.grid[cells[chosen[1]]]["genome"]
         return g1, g2
+        
 
-        """ this is mostly to get data and visualise it.
-         It gets the percentage, and this needs to be used in visualisation.py - for seb"""
-
+      
+    # this declares the percentage of how much of the grid has been filled
     def coverage(self):
-        """What percentage of the grid is filled"""
-        return len(self.grid) / (self.grid_size * self.grid_size)
+        
+        return len(self.grid) / (self.grid_size * self.grid_size) # percentage worked out here 
 
     def filled_cells(self):
-        """How many cells are filled"""
+        #this will count how mancy cells have something inside 
         return len(self.grid)
 
     """
@@ -98,7 +95,7 @@ class Archive:
     this is used to get the best controller
     """
     def best_fitness(self):
-        """get the lowest (best) energy value in the archive."""
+        #this will find the lowest fitness value
         if len(self.grid) == 0:
             return 0.0
         return min(data["fitness"] for data in self.grid.values())
@@ -122,7 +119,7 @@ class Archive:
         print(f"Archive saved to {filename}")
 
     def load(self, filename="archive.json"):
-        """load the archive from a file"""
+        #loads the data from the archive file
         try:
             with open(filename, "r") as f:
                 data = json.load(f)
