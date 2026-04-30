@@ -148,7 +148,7 @@ class Simulation:
             final_y = root_pos[i, 1].item()
             avg_energy = (total_energy[i] / self.episode_length).item()
             distance = (final_x**2 + final_y**2)**0.5
-            fitness = 10 * distance - 0.1 * avg_energy
+            fitness = avg_energy - 0.1 * distance
             print(f"  [SIM] Controller {i+1}: energy={avg_energy:.4f}, pos=({final_x:.2f}, {final_y:.2f})")
             results.append((fitness, final_x, final_y))
 
