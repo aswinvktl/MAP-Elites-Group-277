@@ -123,6 +123,9 @@ class Simulation:
         obs_dict, _ = self.env.reset()
         total_energy = torch.zeros(num_controllers, device=device)
 
+        # Record starting positions after reset
+        root_pos_start = self.env.unwrapped.scene["robot"].data.root_pos_w[:num_controllers].clone()
+
         for step in range(self.episode_length):
             joint_angles = obs_dict["policy"][:num_controllers, 12:20].to(device)
 
@@ -144,12 +147,12 @@ class Simulation:
 
         results = []
         for i in range(num_controllers):
-            final_x = root_pos[i, 0].item()
-            final_y = root_pos[i, 1].item()
-            avg_energy = (total_energy[i] / self.episode_length).item()
-            distance = (final_x**2 + final_y**2)**0.5
-            fitness =  distance - 0.1 * avg_energy
-            print(f"  [SIM] Controller {i+1}: energy={avg_energy:.4f}, pos=({final_x:.2f}, {final_y:.2f})")
-            results.append((fitness, final_x, final_y))
+             final_x = (root_pos[i, 0] - root_pos_start[i, 0]).item()
+             final_y = (root_pos[i, 1] - root_pos_start[i, 1]).item()
+             avg_energy = (total_energy[i] / self.episode_length).item()
+             distance = (final_x**2 + final_y**2)**0.5
+             fitness =  distance - 0.1 * avg_energy
+             print(f"  [SIM] Controller {i+1}: energy={avg_energy:.4f}, pos=({final_x:.2f}, {final_y:.2f})")
+             results.append((fitness, final_x, final_y))
 
         return results
