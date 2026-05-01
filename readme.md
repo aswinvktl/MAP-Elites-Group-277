@@ -30,7 +30,7 @@ Run main.py t
 * Isaac Lab / Isaac Sim installed
 
 # Results
-[!Screenshot](screenshots\Issac_Sim_Screenshot.png)
+![Screenshot](screenshots\Issac_Sim_Screenshot.png)
 
 # Future Work
 * Deploy controller on physical quadruped robot
