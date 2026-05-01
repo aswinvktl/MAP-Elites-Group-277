@@ -1,30 +1,53 @@
-## Implementation of Evolutionary Computation algorithm on parallel computing for a quadruped robot
-
+## Evolutionary Computation for Quadruped Robot Control
 # Overview
-Robust control is a requirement for trustworthy autonomous robots. Robot learning is an active research field with state-of-the-art results in autonomous control. In this project, you will implement an Evolutionary Computation algorithm to train a quadruped robot on the Isaac Lab sim. This simulator allows for fast and parallel processing using NVidia GPUs. You will follow algorithms already implemented by the community to implement your own version of MAP-Elites algorithms and will run it on the university's high-performance computing cluster (HPC). The goal is for the robot to learn to navigate complex environments.
+This project implements an evolutionary computation algorithm (MAP-Elites) to train a quadruped robot in simulation. The system uses parallel computation on GPUs to efficiently explore control strategies.
 
-Developing the controller in Isaac Lab requires skills in C++ and Python. Essential skills for using the HPC include:
-
-     Linux command line: Getting started - Advanced tutorial 
-     Slurm
+Training is performed in Isaac Lab, enabling large-scale experimentation through high-performance computing (HPC). The goal is to develop robust policies capable of navigating complex environments.
  
-You will implement a container solution, e.g. Docker or Apptainer, that will be deployed to the HPC. The HPC will run the learning algorithms, and you will be able to visualise the learned control on the Isaac Lab sim. If time allows, the controller can be run on the real robot on my research group.
+# Key Features
+* MAP-Elites evolutionary algorithm implementation
+* Parallel training on GPU-enabled HPC systems
+* Integration with Isaac Lab simulator
 
-# Deliverables
-      A container solution that will be deployed to the HPC.
-      A training policy for the MAP-Elites algorithms resulted in a control for the robot.
-      A set of diagrams with the learning performance using Tensorboard.
-      Code and documentation uploaded to our Git server.
- 
-# Resources Available
-     Access to the Napier HPC.
-     URDF file that defines the robot inside the simulation.
-     Community-built algorithms, e.g. stable baselines.
-     Access to a physical version of the Hexapod Qutier, implemented following the Qutee robot from Imperial College.
+# Resources Used
+* Python
+* Nividia GPU Computing
+* Issac Lab / Issac Sim
+
+# Installation
+Clone the repository and install dependencies:
+
+git clone https://github.com/aswinvktl/MAP-Elites-Group-277.git
+cd MAP-Elites-Group-277
+pip install -r requirements.txt
+
+# Usage
+Run main.py t
+
+# Requirements
+* Python 3.x
+* NVIDIA GPU + CUDA support
+* Isaac Lab / Isaac Sim installed
+
+# Results
+[!Screenshot](screenshots\Issac_Sim_Screenshot.png)
+
+# Future Work
+* Deploy controller on physical quadruped robot
+* Extend algorithm to diverse terrains and conditions
+* Improve training efficiency and robustness
+
+# Team
+     Aswin Vazhakkoottathil Podimon (Project Manager)
+     David Weir
+     Jamie Harris
+     Sebastian Murray
+     Robbie Black
+     Kipras Tomkevicius
 
 # Contacts
      Client: Simon Smith
      Sponsor: Leni Le Goff
 
-# Requirements
-     Run in terminal "pip install -r requirements.txt" to install needed imports      
+# License
+MIT
