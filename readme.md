@@ -30,6 +30,7 @@ Run main.py t
 * Isaac Lab / Isaac Sim installed
 
 # Results
+Picture of the Issac Sim as it was running:
 ![Screenshot](screenshots\Issac_Sim_Screenshot.png)
 
 # Future Work
