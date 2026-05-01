@@ -17,9 +17,9 @@ Training is performed in Isaac Lab, enabling large-scale experimentation through
 # Installation
 Clone the repository and install dependencies:
 
-git clone https://github.com/aswinvktl/MAP-Elites-Group-277.git
-cd MAP-Elites-Group-277
-pip install -r requirements.txt
+1. git clone https://github.com/aswinvktl/MAP-Elites-Group-277.git
+2. cd MAP-Elites-Group-277
+3. pip install -r requirements.txt
 
 # Usage
 Run main.py t
@@ -31,7 +31,7 @@ Run main.py t
 
 # Results
 Picture of the Issac Sim as it was running:
-![Screenshot](screenshots\Issac_Sim_Screenshot.png)
+![Screenshot](screenshots/Issac_Sim_Screenshot.png)
 
 # Future Work
 * Deploy controller on physical quadruped robot
