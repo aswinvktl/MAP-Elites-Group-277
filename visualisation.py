@@ -41,9 +41,11 @@ def load_data(filename, has_header=False):
 
 # Takes the parsed data and builds out grid points for use in the heatmap and graphs
 def build_grid(parsed):
+    # Checks if a valid data file is found
     if not parsed:
         raise ValueError("No valid data found in CSV")
 
+    # splits the dataset into seperate lists
     max_x = max(p[0] for p in parsed) + 1
     max_y = max(p[1] for p in parsed) + 1
 
@@ -67,24 +69,32 @@ def build_grid(parsed):
 
 # Uses the newly built grid and plots out a heatmap
 def plot_heatmap(grid, out_dir, name):
+    # Sets a path for saving the heatmap
     output_path = out_dir / f"Heatmap_{name}.png"
+
+    # Plots the points of the data on a heatmap
     sns.heatmap(grid[::-1], cmap="viridis", cbar_kws={'label': 'Energy'})
     plt.xlabel('Cell X')
     plt.ylabel('Cell Y')
     plt.title('Energy Heatmap')
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
+
+    # Prints that the file has been saved
     print(f"  [VIS] Heatmap saved to: {os.path.abspath(output_path)}")
 
 
 # Uses the newly built grid and plots out a scatter graph
 def plot_scatter_graph(parsed, out_dir, name):
+    # Sets a path for saving the scatter graph
     output_path = out_dir / f"Scatter_Graph_{name}.png"
 
+    # splits the dataset into seperate lists
     x = [p[3] for p in parsed]
     y = [p[4] for p in parsed]
     energy = [p[2] for p in parsed]
 
+    # Plots the points of the data on a scatter graph
     plt.scatter(x, y, c=energy, cmap="viridis")
     plt.colorbar(label='Energy')
     plt.xlabel('Pos X')
@@ -92,6 +102,8 @@ def plot_scatter_graph(parsed, out_dir, name):
     plt.title('Scatter Graph')
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
+
+    # Prints that the file has been saved
     print(f"  [VIS] Scatter graph saved to: {os.path.abspath(output_path)}")
 
 
